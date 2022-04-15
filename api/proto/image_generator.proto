@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package image_generator;
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/Sh1karno/image_generator";
+
+service ImageGenerator {
+  rpc GetPlaceholder(GetPlaceholderRequest) returns (GetPlaceholderResponse) {
+    option (google.api.http) = {
+      get: "/get_placeholder/{width}/{height}/{backgroundColor}/{textColor}/{text}/{foundSize}"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      produces: "application/octet-stream"
+    };
+  };
+};
+
+message GetPlaceholderRequest {
+  int64 width = 1 [(validate.rules).int64.gt = 0];
+  int64 height = 2 [(validate.rules).int64.gt = 0];
+  string backgroundColor = 3 [(validate.rules).string= {min_bytes: 0, max_bytes: 6, pattern: "[0-9A-Za-z]+"}];
+  string textColor = 4 [(validate.rules).string = {min_bytes: 0, max_bytes: 6, pattern: "[0-9A-Za-z]+"}];
+  string text = 5 [(validate.rules).string= {min_bytes: 0, max_bytes: 20}];
+  int64 foundSize = 6 [(validate.rules).int64.gt = 0];
+};
+
+message GetPlaceholderResponse {
+  bytes image = 1;
+};
